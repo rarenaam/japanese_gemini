@@ -80,5 +80,39 @@ body {
     display: none;
 }
 
+/* De container die de input en de iconen bij elkaar houdt */
+.relative.group {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Zorg dat de input tekst niet onder de iconen verdwijnt tijdens het typen */
+#user-input {
+    padding-right: 100px; /* Ruimte maken voor de 2 iconen aan de rechterkant */
+    text-align: center;
+}
+
+/* De iconen zelf */
+.absolute.right-3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Subtiele animatie voor het badge onder het woord */
+#category-badge {
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+    background-color: transparent;
+    color: var(--zinc-400);
+}
+
+/* Het Japanse woord moet eruit springen */
+#display-word {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
 .fade-in { animation: fadeIn 0.5s ease-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
