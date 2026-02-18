@@ -1,35 +1,25 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Japans Trainer Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-4 bg-white">
 
-    <div class="w-full max-w-2xl bg-white fade-in">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-black tracking-tighter mb-2">
+    <div class="w-full max-w-2xl fade-in">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-black tracking-tighter mb-2 italic">
                 JAPANS<span class="text-red-500">.</span>TRAINER
             </h1>
-            <p class="text-zinc-500 text-sm uppercase tracking-widest font-semibold">Vocabulary Mastery</p>
+            <p class="text-zinc-400 text-[10px] uppercase tracking-[0.3em] font-bold">Vocabulary Mastery</p>
         </div>
 
         <div id="screen-setup" class="space-y-8">
-            <div class="border-2 border-dashed border-zinc-200 rounded-2xl p-6 text-center hover:bg-zinc-50 transition cursor-pointer relative">
+            <div class="border-2 border-dashed border-zinc-100 rounded-2xl p-4 text-center hover:bg-zinc-50 transition cursor-pointer relative">
                 <input type="file" id="csv-upload" accept=".csv" class="absolute inset-0 opacity-0 cursor-pointer">
-                <i data-lucide="upload" class="mx-auto h-8 w-8 text-zinc-400 mb-2"></i>
-                <p class="font-bold text-sm">Upload CSV Bestand</p>
-                <p class="text-xs text-zinc-400 mt-1" id="file-status">Of gebruik de standaard lijst</p>
+                <div class="flex items-center justify-center gap-2 text-zinc-400">
+                    <i data-lucide="upload" class="h-4 w-4"></i>
+                    <p class="font-bold text-xs uppercase tracking-widest" id="file-status">Upload CSV of gebruik standaard</p>
+                </div>
             </div>
 
-            <div class="grid gap-6">
+            <div class="grid gap-8">
                 <div>
-                    <label class="block text-sm font-bold mb-3 text-zinc-700">MODUS</label>
+                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Selecteer Modus</label>
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="selectOption('mode', 'oefenen', this)" class="option-btn active p-4 rounded-xl flex items-center justify-center gap-2">
                             <i data-lucide="book-open" class="w-4 h-4"></i> Oefenen
@@ -41,7 +31,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold mb-3 text-zinc-700">RICHTING</label>
+                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Richting</label>
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="selectOption('direction', 'nl_jp', this)" class="option-btn active p-4 rounded-xl">NL ➔ JP</button>
                         <button onclick="selectOption('direction', 'jp_nl', this)" class="option-btn p-4 rounded-xl">JP ➔ NL</button>
@@ -49,62 +39,73 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold mb-3 text-zinc-700">CATEGORIEËN</label>
+                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Categorieën</label>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="category-grid"></div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold mb-3 text-zinc-700">AANTAL VRAGEN</label>
+                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Aantal Vragen</label>
                     <input type="number" id="word-count" value="10" min="1" class="input-field w-full p-4 rounded-xl text-center font-bold text-lg">
                 </div>
             </div>
 
-            <button onclick="startSession()" class="primary-btn w-full py-5 rounded-xl text-xl uppercase tracking-wide">Start Sessie</button>
+            <button onclick="startSession()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-red-100">Start Sessie</button>
         </div>
 
         <div id="screen-quiz" class="hidden text-center max-w-lg mx-auto">
-            <div class="w-full bg-zinc-100 h-3 rounded-full overflow-hidden mb-10">
-                <div id="progress-bar" class="bg-red-500 h-full transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-16">
+                <div id="progress-bar" class="bg-red-500 h-full transition-all duration-700" style="width: 0%"></div>
             </div>
 
             <div class="mb-12 space-y-4">
-                <span id="quiz-counter" class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Vraag 1/10</span>
-                <h2 id="display-word" class="text-6xl font-black text-zinc-900 break-words italic">...</h2>
-                <span id="category-badge" class="inline-block bg-zinc-100 text-zinc-500 text-xs px-2 py-1 rounded font-bold uppercase">...</span>
+                <span id="quiz-counter" class="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em]">Vraag 1/10</span>
+                <h2 id="display-word" class="text-7xl font-black text-zinc-900 break-words italic tracking-tighter">...</h2>
+                <div id="category-badge" class="inline-block bg-zinc-50 text-zinc-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-zinc-100">...</div>
             </div>
 
-            <input type="text" id="user-input" placeholder="Typ je antwoord..." autocomplete="off"
-                   class="input-field w-full bg-white text-3xl p-6 rounded-2xl text-center font-bold text-zinc-800 placeholder:text-zinc-300">
-
-            <div id="feedback-msg" class="h-8 mt-4 text-sm font-bold text-zinc-500"></div>
-
-            <div class="flex gap-4 mt-8">
-                <button id="btn-hint" onclick="getHint()" class="flex-1 py-3 rounded-xl font-bold text-zinc-400 hover:bg-zinc-50 transition">HINT</button>
-                <button onclick="skipWord()" class="flex-1 py-3 rounded-xl font-bold text-zinc-400 hover:bg-zinc-50 transition">OVERSLAAN</button>
+            <div class="relative group max-w-md mx-auto">
+                <input type="text" id="user-input" placeholder="Antwoord..." autocomplete="off"
+                       class="input-field w-full bg-white text-3xl p-6 pr-28 rounded-3xl text-center font-bold text-zinc-800 placeholder:text-zinc-200">
+                
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button id="btn-hint" onclick="getHint()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-colors" title="Hint">
+                        <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                    </button>
+                    <button onclick="skipWord()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-colors" title="Overslaan">
+                        <i data-lucide="chevron-right" class="w-7 h-7"></i>
+                    </button>
+                </div>
             </div>
+
+            <div id="feedback-msg" class="h-8 mt-6 text-[10px] font-black uppercase tracking-[0.2em]"></div>
         </div>
 
         <div id="screen-results" class="hidden text-center">
-            <h2 class="text-3xl font-black mb-8">Sessie Voltooid!</h2>
-            <div class="grid grid-cols-2 gap-4 mb-8 text-center">
-                <div class="bg-zinc-50 p-6 rounded-2xl">
-                    <p id="final-score" class="text-4xl font-black text-red-500">0%</p>
-                    <p class="text-xs font-bold text-zinc-400 uppercase">Score</p>
+            <h2 class="text-4xl font-black mb-12 italic tracking-tighter">Resultaat<span class="text-red-500">.</span></h2>
+            <div class="grid grid-cols-2 gap-6 mb-12">
+                <div class="bg-zinc-50 p-8 rounded-3xl border border-zinc-100">
+                    <p id="final-score" class="text-5xl font-black text-red-500 mb-1">0%</p>
+                    <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Nauwkeurigheid</p>
                 </div>
-                <div class="bg-zinc-50 p-6 rounded-2xl">
-                    <p id="stat-correct" class="text-4xl font-black text-zinc-900">0</p>
-                    <p class="text-xs font-bold text-zinc-400 uppercase">Goed</p>
+                <div class="bg-zinc-50 p-8 rounded-3xl border border-zinc-100">
+                    <p id="stat-correct" class="text-5xl font-black text-zinc-900 mb-1">0</p>
+                    <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Correct</p>
                 </div>
             </div>
-            <div id="mistakes-container" class="hidden text-left mb-8 space-y-2">
-                <p class="font-bold text-sm text-zinc-400 uppercase tracking-widest">Verbeterpunten:</p>
-                <div id="mistakes-list" class="space-y-2"></div>
+            
+            <div id="mistakes-container" class="hidden text-left mb-10">
+                <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 px-2">Nog even oefenen:</p>
+                <div id="mistakes-list" class="grid gap-2"></div>
             </div>
-            <button onclick="location.reload()" class="primary-btn w-full py-4 rounded-xl text-lg">Nieuwe Sessie</button>
+
+            <button onclick="location.reload()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest">Opnieuw Proberen</button>
         </div>
     </div>
-    
+
     <script src="js/words.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // Initialiseer iconen bij start
+        lucide.createIcons();
+    </script>
 </body>
-</html>
