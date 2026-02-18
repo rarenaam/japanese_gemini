@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japans Meester</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app-container">
+        <section id="screen-start" class="screen active">
+            <h1 class="glow-text">Japans Leren</h1>
+            <div class="menu-stack">
+                <button onclick="ui.setTaal('jp')" class="btn-main">Nederlands ➔ Japans</button>
+                <button onclick="ui.setTaal('nl')" class="btn-main">Japans ➔ Nederlands</button>
+            </div>
+        </section>
+
+        <section id="screen-quiz" class="screen">
+            <div class="stats-bar">
+                <span id="stat-count">Word 1/10</span>
+                <div id="progress-dots"></div>
+            </div>
+            <div class="quiz-card">
+                <h2 id="display-word">...</h2>
+                <input type="text" id="user-input" placeholder="Typ antwoord..." autocomplete="off">
+                <div id="feedback"></div>
+            </div>
+            <div class="controls">
+                <button onclick="logic.getHint()" class="btn-sub">HINT</button>
+                <button onclick="logic.skip()" class="btn-sub">SKIP</button>
+            </div>
+        </section>
+    </div>
+    <script src="js/woorden.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
