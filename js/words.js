@@ -1,4 +1,4 @@
-export const allWords = [
+allWords = [
   // VOEDSEL
   {jp:"りんご",nl:"appel",romaji:"ringo",cat:"voedsel",taal:"hiragana",hoofdklank:""},
   {jp:"みかん",nl:"sinaasappel",romaji:"mikan",cat:"voedsel",taal:"hiragana",hoofdklank:""},
