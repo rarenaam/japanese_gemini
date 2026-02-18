@@ -54,5 +54,31 @@ body {
     75% { transform: translateX(5px); }
 }
 
+/* Zorg dat de input genoeg ruimte heeft rechts voor de iconen */
+.input-field {
+    border: 2px solid var(--border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-field:focus {
+    border-color: #000; /* Zwarte border bij focus is erg Episolo */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* De icoon knoppen subtiel maken */
+#btn-hint:hover, button[onclick="skipWord()"]:hover {
+    transform: scale(1.1);
+}
+
+/* Feedback bericht animatie */
+#feedback-msg {
+    letter-spacing: 0.1em;
+}
+
+/* Verberg de oude knoppen container als die er nog staat */
+.flex.gap-4.mt-8 {
+    display: none;
+}
+
 .fade-in { animation: fadeIn 0.5s ease-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
