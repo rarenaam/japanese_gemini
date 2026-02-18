@@ -1,106 +1,114 @@
-// Onze 'State' (wat de app onthoudt)
-let quizData = {
-    words: [{jp: "こんにちは", nl: "hallo", romaji: "konnichiwa"}],
-    currentIndex: 0,
-    score: 0,
-    startTime: 0,
-    direction: 'nl_jp', // of 'jp_nl'
-    isTest: false
+let allWords = [
+    {jp: "ねこ", nl: "kat", romaji: "neko", cat: "dieren"},
+    {jp: "いぬ", nl: "hond", romaji: "inu", cat: "dieren"},
+    {jp: "たべる", nl: "eten", romaji: "taberu", cat: "werkwoorden"},
+    {jp: "みず", nl: "water", romaji: "mizu", cat: "basis"},
+    {jp: "こんにちは", nl: "hallo", romaji: "konnichiwa", cat: "groeten"}
+];
+
+let settings = { mode: 'oefenen', direction: 'nl_jp', selectedCats: [] };
+let session = { queue: [], index: 0, correct: 0, mistakes: [] };
+
+window.onload = () => {
+    lucide.createIcons();
+    renderCategories();
 };
 
-// 1. CSV Bestanden inladen
-document.getElementById('csv-upload')?.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            quizData.words = results.data;
-            alert(`${results.data.length} woorden succesvol geladen!`);
-        }
+function renderCategories() {
+    const cats = [...new Set(allWords.map(w => w.cat || 'overig'))];
+    const grid = document.getElementById('category-grid');
+    grid.innerHTML = '';
+    cats.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn p-3 rounded-lg text-xs uppercase font-bold';
+        btn.innerText = cat;
+        btn.onclick = () => {
+            btn.classList.toggle('active');
+            settings.selectedCats.includes(cat) ? 
+                settings.selectedCats = settings.selectedCats.filter(c => c !== cat) : 
+                settings.selectedCats.push(cat);
+        };
+        grid.appendChild(btn);
     });
-});
+}
 
-// 2. De Quiz Starten
-function startQuiz(mode, direction) {
-    quizData.isTest = mode === 'toets';
-    quizData.direction = direction;
-    quizData.currentIndex = 0;
-    quizData.score = 0;
-    quizData.startTime = Date.now();
+function selectOption(key, value, btn) {
+    settings[key] = value;
+    btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function startSession() {
+    let list = allWords.filter(w => settings.selectedCats.length === 0 || settings.selectedCats.includes(w.cat));
+    list.sort(() => Math.random() - 0.5);
+    const count = parseInt(document.getElementById('word-count').value) || 10;
     
-    // Shuffle woorden
-    quizData.words.sort(() => Math.random() - 0.5);
+    session = { queue: list.slice(0, count), index: 0, correct: 0, mistakes: [] };
     
-    showScreen('session-screen');
+    document.getElementById('screen-setup').classList.add('hidden');
+    document.getElementById('screen-quiz').classList.remove('hidden');
+    document.getElementById('btn-hint').style.display = settings.mode === 'toets' ? 'none' : 'block';
+    
     renderWord();
 }
 
-// 3. Het woord op het scherm zetten
 function renderWord() {
-    const current = quizData.words[quizData.currentIndex];
-    const displayElement = document.getElementById('question-display');
-    
-    // Kies welke taal we tonen
-    displayElement.innerText = quizData.direction === 'nl_jp' ? current.nl : current.jp;
-    
-    // Update voortgang
-    const progress = (quizData.currentIndex / quizData.words.length) * 100;
-    document.getElementById('progress-bar').style.width = `${progress}%`;
+    const w = session.queue[session.index];
+    document.getElementById('display-word').innerText = settings.direction === 'nl_jp' ? w.nl : w.jp;
+    document.getElementById('quiz-counter').innerText = `VRAGEN ${session.index + 1} / ${session.queue.length}`;
+    document.getElementById('category-badge').innerText = w.cat || 'algemeen';
+    document.getElementById('progress-bar').style.width = `${(session.index / session.queue.length) * 100}%`;
+    document.getElementById('user-input').value = '';
+    document.getElementById('user-input').focus();
 }
 
-// 4. Antwoord controleren
-function checkAnswer() {
-    const inputField = document.getElementById('answer-input');
-    const userAnswer = inputField.value.trim().toLowerCase();
-    const currentWord = quizData.words[quizData.currentIndex];
-    const correctAnswer = quizData.direction === 'nl_jp' ? currentWord.jp : currentWord.nl;
+document.getElementById('user-input').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') checkAnswer();
+});
 
-    if (userAnswer === correctAnswer.toLowerCase()) {
-        quizData.score++;
-        showFeedback("Correct! 🎉", "success");
+function checkAnswer() {
+    const input = document.getElementById('user-input');
+    const val = input.value.trim().toLowerCase();
+    const w = session.queue[session.index];
+    const correct = (settings.direction === 'nl_jp' ? w.jp : w.nl).toLowerCase();
+
+    if(val === correct) {
+        session.correct++;
         nextWord();
     } else {
-        if (quizData.isTest) {
-            showFeedback(`Fout! Het was: ${correctAnswer}`, "error");
+        if(settings.mode === 'toets') {
+            session.mistakes.push({...w, userAnswer: val});
             nextWord();
         } else {
-            // In oefenmodus schudden we de kaart en mag je het opnieuw proberen
-            document.querySelector('.glass-card').classList.add('shake');
-            setTimeout(() => document.querySelector('.glass-card').classList.remove('shake'), 500);
-            showFeedback("Probeer het nog eens...", "hint");
+            input.classList.add('shake');
+            setTimeout(() => input.classList.remove('shake'), 400);
+            document.getElementById('feedback-msg').innerText = "Probeer het nog eens...";
         }
     }
-    inputField.value = "";
 }
 
-// 5. Naar het volgende woord of resultaten
 function nextWord() {
-    quizData.currentIndex++;
-    if (quizData.currentIndex < quizData.words.length) {
-        setTimeout(renderWord, 600);
-    } else {
-        setTimeout(showResults, 1000);
+    session.index++;
+    if(session.index < session.queue.length) renderWord();
+    else finishSession();
+}
+
+function finishSession() {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-results').classList.remove('hidden');
+    document.getElementById('final-score').innerText = Math.round((session.correct / session.queue.length) * 100) + '%';
+    document.getElementById('stat-correct').innerText = session.correct;
+
+    if(session.mistakes.length > 0) {
+        document.getElementById('mistakes-container').classList.remove('hidden');
+        const list = document.getElementById('mistakes-list');
+        list.innerHTML = session.mistakes.map(m => 
+            `<div class="p-3 bg-red-50 text-red-700 rounded-lg text-sm font-bold">${m.jp} = ${m.nl}</div>`
+        ).join('');
     }
 }
 
-function showResults() {
-    const duration = Math.round((Date.now() - quizData.startTime) / 1000);
-    const percentage = Math.round((quizData.score / quizData.words.length) * 100);
-    
-    document.getElementById('final-score').innerText = `${percentage}%`;
-    document.getElementById('time-taken').innerText = `${duration} seconden`;
-    showScreen('results-screen');
-}
-
-// Helper: Schermen wisselen
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-}
-
-function showFeedback(text, type) {
-    const fb = document.getElementById('feedback');
-    fb.innerText = text;
-    fb.className = `feedback-${type} animate-fade-in-up`;
+function getHint() {
+    const w = session.queue[session.index];
+    document.getElementById('feedback-msg').innerText = `Begint met: ${settings.direction === 'nl_jp' ? w.jp[0] : w.nl[0]}`;
 }
