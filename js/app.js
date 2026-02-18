@@ -56,6 +56,7 @@ function renderWord() {
     const w = session.queue[session.index];
     const display = document.getElementById('display-word');
     const badge = document.getElementById('category-badge');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     
     display.innerText = settings.direction === 'nl_jp' ? w.nl : w.jp;
     document.getElementById('quiz-counter').innerText = `WOORD ${session.index + 1} / ${session.queue.length}`;
