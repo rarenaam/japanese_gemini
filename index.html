@@ -1,6 +1,25 @@
-<body class="min-h-screen flex items-center justify-center p-4 bg-white">
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japans.Trainer | Mastery</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-white text-zinc-900">
 
     <div class="w-full max-w-2xl fade-in">
+        
         <div class="text-center mb-12">
             <h1 class="text-4xl font-black tracking-tighter mb-2 italic">
                 JAPANS<span class="text-red-500">.</span>TRAINER
@@ -9,9 +28,10 @@
         </div>
 
         <div id="screen-setup" class="space-y-8">
-            <div class="border-2 border-dashed border-zinc-100 rounded-2xl p-4 text-center hover:bg-zinc-50 transition cursor-pointer relative">
+            
+            <div class="border-2 border-dashed border-zinc-100 rounded-2xl p-4 text-center hover:bg-zinc-50 transition cursor-pointer relative group">
                 <input type="file" id="csv-upload" accept=".csv" class="absolute inset-0 opacity-0 cursor-pointer">
-                <div class="flex items-center justify-center gap-2 text-zinc-400">
+                <div class="flex items-center justify-center gap-2 text-zinc-400 group-hover:text-zinc-600 transition-colors">
                     <i data-lucide="upload" class="h-4 w-4"></i>
                     <p class="font-bold text-xs uppercase tracking-widest" id="file-status">Upload CSV of gebruik standaard</p>
                 </div>
@@ -31,16 +51,17 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Richting</label>
+                    <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Vraagstelling</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="selectOption('direction', 'nl_jp', this)" class="option-btn active p-4 rounded-xl">NL ➔ JP</button>
-                        <button onclick="selectOption('direction', 'jp_nl', this)" class="option-btn p-4 rounded-xl">JP ➔ NL</button>
+                        <button onclick="selectOption('direction', 'nl_jp', this)" class="option-btn active p-4 rounded-xl font-bold">NL ➔ JP</button>
+                        <button onclick="selectOption('direction', 'jp_nl', this)" class="option-btn p-4 rounded-xl font-bold">JP ➔ NL</button>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[10px] font-black mb-3 text-zinc-400 uppercase tracking-widest">Categorieën</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="category-grid"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="category-grid">
+                        </div>
                 </div>
 
                 <div>
@@ -49,29 +70,34 @@
                 </div>
             </div>
 
-            <button onclick="startSession()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-red-100">Start Sessie</button>
+            <button onclick="startSession()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-red-100">
+                Start Sessie
+            </button>
         </div>
 
         <div id="screen-quiz" class="hidden text-center max-w-lg mx-auto">
+            
             <div class="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mb-16">
-                <div id="progress-bar" class="bg-red-500 h-full transition-all duration-700" style="width: 0%"></div>
+                <div id="progress-bar" class="bg-red-500 h-full transition-all duration-700 shadow-[0_0_10px_rgba(239,68,68,0.4)]" style="width: 0%"></div>
             </div>
 
             <div class="mb-12 space-y-4">
                 <span id="quiz-counter" class="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em]">Vraag 1/10</span>
-                <h2 id="display-word" class="text-7xl font-black text-zinc-900 break-words italic tracking-tighter">...</h2>
-                <div id="category-badge" class="inline-block bg-zinc-50 text-zinc-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-zinc-100">...</div>
+                <h2 id="display-word" class="text-7xl font-black text-zinc-900 break-words italic tracking-tighter transition-all">...</h2>
+                <div id="category-badge" class="inline-block bg-zinc-50 text-zinc-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-zinc-100">
+                    ...
+                </div>
             </div>
 
             <div class="relative group max-w-md mx-auto">
                 <input type="text" id="user-input" placeholder="Antwoord..." autocomplete="off"
-                       class="input-field w-full bg-white text-3xl p-6 pr-28 rounded-3xl text-center font-bold text-zinc-800 placeholder:text-zinc-200">
+                       class="input-field w-full bg-white text-3xl p-6 pr-28 rounded-3xl text-center font-bold text-zinc-800 placeholder:text-zinc-100">
                 
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    <button id="btn-hint" onclick="getHint()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-colors" title="Hint">
+                <div class="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button id="btn-hint" onclick="getHint()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-all hover:scale-110" title="Hint">
                         <i data-lucide="lightbulb" class="w-6 h-6"></i>
                     </button>
-                    <button onclick="skipWord()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-colors" title="Overslaan">
+                    <button onclick="skipWord()" class="p-2 text-zinc-300 hover:text-zinc-900 transition-all hover:scale-110" title="Overslaan">
                         <i data-lucide="chevron-right" class="w-7 h-7"></i>
                     </button>
                 </div>
@@ -81,7 +107,8 @@
         </div>
 
         <div id="screen-results" class="hidden text-center">
-            <h2 class="text-4xl font-black mb-12 italic tracking-tighter">Resultaat<span class="text-red-500">.</span></h2>
+            <h2 class="text-4xl font-black mb-12 italic tracking-tighter text-zinc-900">Resultaat<span class="text-red-500">.</span></h2>
+            
             <div class="grid grid-cols-2 gap-6 mb-12">
                 <div class="bg-zinc-50 p-8 rounded-3xl border border-zinc-100">
                     <p id="final-score" class="text-5xl font-black text-red-500 mb-1">0%</p>
@@ -94,18 +121,22 @@
             </div>
             
             <div id="mistakes-container" class="hidden text-left mb-10">
-                <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 px-2">Nog even oefenen:</p>
-                <div id="mistakes-list" class="grid gap-2"></div>
+                <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 px-2">Verbeterpunten:</p>
+                <div id="mistakes-list" class="grid gap-3">
+                    </div>
             </div>
 
-            <button onclick="location.reload()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest">Opnieuw Proberen</button>
+            <button onclick="location.reload()" class="primary-btn w-full py-5 rounded-2xl text-sm font-black uppercase tracking-widest">
+                Opnieuw Proberen
+            </button>
         </div>
     </div>
 
     <script src="js/words.js"></script>
     <script src="js/app.js"></script>
     <script>
-        // Initialiseer iconen bij start
+        // Start de iconen direct bij het laden van de pagina
         lucide.createIcons();
     </script>
 </body>
+</html>
