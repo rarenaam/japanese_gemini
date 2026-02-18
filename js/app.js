@@ -57,7 +57,10 @@ function renderWord() {
     const w = session.queue[session.index];
     document.getElementById('display-word').innerText = settings.direction === 'nl_jp' ? w.nl : w.jp;
     document.getElementById('quiz-counter').innerText = `WOORD ${session.index + 1} / ${session.queue.length}`;
-    document.getElementById('category-badge').innerText = w.cat;
+    
+    // Hier voegen we het type (Hiragana/Katakana) toe aan de badge
+    document.getElementById('category-badge').innerText = `${w.cat} (${w.type})`;
+    
     document.getElementById('progress-bar').style.width = `${(session.index / session.queue.length) * 100}%`;
     document.getElementById('user-input').value = '';
     document.getElementById('user-input').focus();
