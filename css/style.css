@@ -1,72 +1,58 @@
-/* Custom Properties voor de Episolo-look */
 :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card: #18181b;
     --primary: #ef4444;
-    --secondary: #27272a;
-    --muted: #71717a;
+    --active-bg: #000000;
+    --active-text: #ffffff;
+    --inactive-bg: #ffffff;
+    --inactive-text: #18181b;
+    --border: #e4e4e7;
 }
 
-/* De basis layout */
 body {
-    background-color: var(--background);
-    color: var(--foreground);
-    background-image: radial-gradient(ellipse at top, rgba(239, 68, 68, 0.15), var(--background));
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: #ffffff;
+    color: #18181b;
+    font-family: 'Inter', sans-serif;
 }
 
-/* De 'Glass' kaarten */
-.glass-card {
-    background: rgba(24, 24, 27, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s ease;
+.option-btn {
+    background-color: var(--inactive-bg);
+    color: var(--inactive-text);
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+    font-weight: 600;
 }
 
-/* Animaties uit de config */
-.animate-fade-in-up {
-    animation: fadeInUp 0.5s ease-out forwards;
+.option-btn.active {
+    background-color: var(--active-bg);
+    color: var(--active-text);
+    border-color: var(--active-bg);
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.primary-btn {
+    background-color: var(--primary);
+    color: white;
+    transition: all 0.2s;
 }
 
-/* De schud-animatie bij een fout antwoord */
-.shake {
-    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+.primary-btn:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
 }
 
+.input-field {
+    border: 2px solid var(--border);
+}
+
+.input-field:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.shake { animation: shake 0.4s both; }
 @keyframes shake {
-    10%, 90% { transform: translate3d(-1px, 0, 0); }
-    20%, 80% { transform: translate3d(2px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-    40%, 60% { transform: translate3d(4px, 0, 0); }
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
-/* Progress bar styling */
-.progress-container {
-    width: 100%;
-    background: var(--secondary);
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-
-#progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), #ec4899);
-    width: 0%;
-    transition: width 0.4s ease;
-}
+.fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
