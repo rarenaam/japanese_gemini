@@ -1,118 +1,153 @@
+/* --- SHADCN / TAILWIND VARIABLES --- */
 :root {
-    --primary: #ef4444;
-    --active-bg: #000000;
-    --active-text: #ffffff;
-    --inactive-bg: #ffffff;
-    --inactive-text: #18181b;
-    --border: #e4e4e7;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 1rem;
+  --japan-red: #ef4444;
 }
 
+/* --- CORE STYLING --- */
 body {
-    background-color: #ffffff;
-    color: #18181b;
-    font-family: 'Inter', sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* --- EPISOLO COMPONENTS --- */
+
+/* Knoppen (Categorieën & Modus) */
 .option-btn {
-    background-color: var(--inactive-bg);
-    color: var(--inactive-text);
-    border: 2px solid var(--border);
-    transition: all 0.2s ease;
-    font-weight: 600;
+  background-color: transparent;
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.option-btn:hover {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
 }
 
 .option-btn.active {
-    background-color: var(--active-bg);
-    color: var(--active-text);
-    border-color: var(--active-bg);
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* De Input Bar (Episolo Stijl) */
+.input-field {
+  border: 1px solid hsl(var(--border));
+  border-radius: 1.5rem;
+  background-color: hsl(var(--background));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-field:focus {
+  border-color: hsl(var(--primary));
+  outline: none;
+  box-shadow: 0 0 0 2px hsla(var(--primary), 0.1);
+  transform: translateY(-2px);
+}
+
+/* De Grote Startknop */
 .primary-btn {
-    background-color: var(--primary);
-    color: white;
-    transition: all 0.2s;
+  background-color: var(--japan-red);
+  color: white;
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.2);
 }
 
 .primary-btn:hover {
-    background-color: #dc2626;
-    transform: translateY(-1px);
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.3);
 }
 
-.input-field {
-    border: 2px solid var(--border);
+/* --- ANIMATIONS --- */
+
+.fade-in {
+  animation: fade-in-up 0.6s ease-out forwards;
 }
 
-.input-field:focus {
-    border-color: var(--primary);
-    outline: none;
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.shake { animation: shake 0.4s both; }
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
 }
 
-/* Zorg dat de input genoeg ruimte heeft rechts voor de iconen */
-.input-field {
-    border: 2px solid var(--border);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* Progress bar met Shimmer effect uit jouw lijst */
+#progress-bar {
+  position: relative;
+  overflow: hidden;
 }
 
-.input-field:focus {
-    border-color: #000; /* Zwarte border bij focus is erg Episolo */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+#progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
 }
 
-/* De icoon knoppen subtiel maken */
-#btn-hint:hover, button[onclick="skipWord()"]:hover {
-    transform: scale(1.1);
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-/* Feedback bericht animatie */
-#feedback-msg {
-    letter-spacing: 0.1em;
+/* Scale-in voor de resultaten lijst */
+#mistakes-list > div {
+  animation: scale-in 0.4s ease-out forwards;
 }
 
-/* Verberg de oude knoppen container als die er nog staat */
-.flex.gap-4.mt-8 {
-    display: none;
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
-/* De container die de input en de iconen bij elkaar houdt */
-.relative.group {
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-/* Zorg dat de input tekst niet onder de iconen verdwijnt tijdens het typen */
-#user-input {
-    padding-right: 100px; /* Ruimte maken voor de 2 iconen aan de rechterkant */
-    text-align: center;
-}
-
-/* De iconen zelf */
-.absolute.right-3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Subtiele animatie voor het badge onder het woord */
-#category-badge {
-    transition: all 0.3s ease;
-    border: 1px solid var(--border);
-    background-color: transparent;
-    color: var(--zinc-400);
-}
-
-/* Het Japanse woord moet eruit springen */
+/* --- TYPOGRAPHY --- */
 #display-word {
-    font-size: 4rem;
-    line-height: 1;
-    margin-bottom: 0.5rem;
+  letter-spacing: -0.05em;
+  font-family: "Hiragino Sans", "Meiryo", sans-serif;
 }
 
-.fade-in { animation: fadeIn 0.5s ease-out; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.text-gradient {
+  background: linear-gradient(to right, #000, #444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
