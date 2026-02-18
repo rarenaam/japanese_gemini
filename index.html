@@ -3,129 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語 Vocabulary Trainer</title>
+    <title>Japans Trainer Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root { --background: #09090b; --foreground: #fafafa; --primary: #ef4444; }
-        body { background: var(--background); color: var(--foreground); font-family: sans-serif; }
-        .glass { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .gradient-bg { background: radial-gradient(ellipse at top, rgba(239, 68, 68, 0.15), #09090b); }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="gradient-bg min-h-screen p-4 flex flex-col items-center">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div id="setup-screen" class="w-full max-w-2xl space-y-8 py-10 animate-in">
-        <div class="text-center space-y-2">
-            <h1 class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-600">日本語 Trainer</h1>
-            <p class="text-zinc-400">Upload je CSV of gebruik de ingebouwde lijst.</p>
+    <div class="w-full max-w-2xl bg-white fade-in">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-black tracking-tighter mb-2">
+                JAPANS<span class="text-red-500">.</span>TRAINER
+            </h1>
+            <p class="text-zinc-500 text-sm uppercase tracking-widest font-semibold">Vocabulary Mastery</p>
         </div>
 
-        <div class="glass p-8 rounded-3xl space-y-6">
-            <div class="border-2 border-dashed border-zinc-700 p-6 rounded-xl text-center">
-                <input type="file" id="csv-upload" accept=".csv" class="hidden">
-                <label for="csv-upload" class="cursor-pointer block">
-                    <i data-lucide="upload" class="mx-auto mb-2 text-red-500"></i>
-                    <span class="text-sm font-medium">Klik om woorden.csv te laden</span>
-                </label>
+        <div id="screen-setup" class="space-y-8">
+            <div class="border-2 border-dashed border-zinc-200 rounded-2xl p-6 text-center hover:bg-zinc-50 transition cursor-pointer relative">
+                <input type="file" id="csv-upload" accept=".csv" class="absolute inset-0 opacity-0 cursor-pointer">
+                <i data-lucide="upload" class="mx-auto h-8 w-8 text-zinc-400 mb-2"></i>
+                <p class="font-bold text-sm">Upload CSV Bestand</p>
+                <p class="text-xs text-zinc-400 mt-1" id="file-status">Of gebruik de standaard lijst</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="setDirection('nl_jp')" id="btn-nl-jp" class="bg-red-500 text-white p-4 rounded-xl font-bold border-2 border-transparent">NL ➔ JP</button>
-                <button onclick="setDirection('jp_nl')" id="btn-jp-nl" class="bg-zinc-800 p-4 rounded-xl font-bold border-2 border-transparent">JP ➔ NL</button>
+            <div class="grid gap-6">
+                <div>
+                    <label class="block text-sm font-bold mb-3 text-zinc-700">MODUS</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectOption('mode', 'oefenen', this)" class="option-btn active p-4 rounded-xl flex items-center justify-center gap-2">
+                            <i data-lucide="book-open" class="w-4 h-4"></i> Oefenen
+                        </button>
+                        <button onclick="selectOption('mode', 'toets', this)" class="option-btn p-4 rounded-xl flex items-center justify-center gap-2">
+                            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Toets
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-3 text-zinc-700">RICHTING</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectOption('direction', 'nl_jp', this)" class="option-btn active p-4 rounded-xl">NL ➔ JP</button>
+                        <button onclick="selectOption('direction', 'jp_nl', this)" class="option-btn p-4 rounded-xl">JP ➔ NL</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-3 text-zinc-700">CATEGORIEËN</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="category-grid"></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-3 text-zinc-700">AANTAL VRAGEN</label>
+                    <input type="number" id="word-count" value="10" min="1" class="input-field w-full p-4 rounded-xl text-center font-bold text-lg">
+                </div>
             </div>
 
-            <button onclick="startQuiz()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg hover:scale-[1.02] transition">START TRAINING</button>
+            <button onclick="startSession()" class="primary-btn w-full py-5 rounded-xl text-xl uppercase tracking-wide">Start Sessie</button>
+        </div>
+
+        <div id="screen-quiz" class="hidden text-center max-w-lg mx-auto">
+            <div class="w-full bg-zinc-100 h-3 rounded-full overflow-hidden mb-10">
+                <div id="progress-bar" class="bg-red-500 h-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="mb-12 space-y-4">
+                <span id="quiz-counter" class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Vraag 1/10</span>
+                <h2 id="display-word" class="text-6xl font-black text-zinc-900 break-words italic">...</h2>
+                <span id="category-badge" class="inline-block bg-zinc-100 text-zinc-500 text-xs px-2 py-1 rounded font-bold uppercase">...</span>
+            </div>
+
+            <input type="text" id="user-input" placeholder="Typ je antwoord..." autocomplete="off"
+                   class="input-field w-full bg-white text-3xl p-6 rounded-2xl text-center font-bold text-zinc-800 placeholder:text-zinc-300">
+
+            <div id="feedback-msg" class="h-8 mt-4 text-sm font-bold text-zinc-500"></div>
+
+            <div class="flex gap-4 mt-8">
+                <button id="btn-hint" onclick="getHint()" class="flex-1 py-3 rounded-xl font-bold text-zinc-400 hover:bg-zinc-50 transition">HINT</button>
+                <button onclick="skipWord()" class="flex-1 py-3 rounded-xl font-bold text-zinc-400 hover:bg-zinc-50 transition">OVERSLAAN</button>
+            </div>
+        </div>
+
+        <div id="screen-results" class="hidden text-center">
+            <h2 class="text-3xl font-black mb-8">Sessie Voltooid!</h2>
+            <div class="grid grid-cols-2 gap-4 mb-8 text-center">
+                <div class="bg-zinc-50 p-6 rounded-2xl">
+                    <p id="final-score" class="text-4xl font-black text-red-500">0%</p>
+                    <p class="text-xs font-bold text-zinc-400 uppercase">Score</p>
+                </div>
+                <div class="bg-zinc-50 p-6 rounded-2xl">
+                    <p id="stat-correct" class="text-4xl font-black text-zinc-900">0</p>
+                    <p class="text-xs font-bold text-zinc-400 uppercase">Goed</p>
+                </div>
+            </div>
+            <div id="mistakes-container" class="hidden text-left mb-8 space-y-2">
+                <p class="font-bold text-sm text-zinc-400 uppercase tracking-widest">Verbeterpunten:</p>
+                <div id="mistakes-list" class="space-y-2"></div>
+            </div>
+            <button onclick="location.reload()" class="primary-btn w-full py-4 rounded-xl text-lg">Nieuwe Sessie</button>
         </div>
     </div>
 
-    <div id="session-screen" class="hidden w-full max-w-xl space-y-6 py-10">
-        <div id="progress-bar" class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-            <div id="progress-inner" class="bg-red-500 h-full w-0 transition-all"></div>
-        </div>
-
-        <div class="glass p-10 rounded-[2.5rem] text-center space-y-8 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500"></div>
-            <p id="direction-label" class="text-xs tracking-widest text-zinc-500 uppercase">Vertaal naar Japans</p>
-            <h2 id="question-text" class="text-6xl font-black tracking-tighter italic">...</h2>
-            <input type="text" id="answer-input" placeholder="Type antwoord..." class="w-full bg-zinc-900 border border-zinc-700 p-5 rounded-2xl text-2xl text-center outline-none focus:border-red-500 transition">
-            
-            <div class="flex justify-center gap-6">
-                <button onclick="showHint()" class="text-zinc-500 hover:text-white transition"><i data-lucide="lightbulb"></i></button>
-                <button onclick="skipWord()" class="text-zinc-500 hover:text-white transition"><i data-lucide="help-circle"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="results-screen" class="hidden w-full max-w-2xl space-y-6 py-10 text-center">
-        <h2 class="text-4xl font-black">Sessie Voltooid!</h2>
-        <div class="grid grid-cols-3 gap-4">
-            <div class="glass p-6 rounded-2xl"><p class="text-xs text-zinc-500">SCORE</p><p id="res-score" class="text-2xl font-black text-red-500">0%</p></div>
-            <div class="glass p-6 rounded-2xl"><p class="text-xs text-zinc-500">TIJD</p><p id="res-time" class="text-2xl font-black">0s</p></div>
-            <div class="glass p-6 rounded-2xl"><p class="text-xs text-zinc-500">GOED</p><p id="res-count" class="text-2xl font-black">0/0</p></div>
-        </div>
-        <button onclick="location.reload()" class="w-full bg-red-500 p-4 rounded-xl font-bold">Terug naar Home</button>
-    </div>
-
-    <script>
-        let words = [{jp: "こんにちは", nl: "hallo", romaji: "konnichiwa"}];
-        let state = { direction: 'nl_jp', index: 0, score: 0, startTime: 0, results: [] };
-
-        // CSV Loader
-        document.getElementById('csv-upload').addEventListener('change', (e) => {
-            Papa.parse(e.target.files[0], {
-                header: true,
-                complete: (r) => { words = r.data; alert("Lijst geladen!"); }
-            });
-        });
-
-        function setDirection(d) {
-            state.direction = d;
-            document.getElementById('btn-nl-jp').classList.toggle('border-red-500', d==='nl_jp');
-            document.getElementById('btn-jp-nl').classList.toggle('border-red-500', d==='jp_nl');
-        }
-
-        function startQuiz() {
-            state.startTime = Date.now();
-            showScreen('session-screen');
-            render();
-        }
-
-        function render() {
-            const w = words[state.index];
-            document.getElementById('question-text').innerText = state.direction === 'nl_jp' ? w.nl : w.jp;
-            document.getElementById('progress-inner').style.width = `${(state.index / words.length) * 100}%`;
-            document.getElementById('answer-input').focus();
-        }
-
-        document.getElementById('answer-input').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') {
-                const ans = e.target.value.trim().toLowerCase();
-                const correct = state.direction === 'nl_jp' ? words[state.index].jp : words[state.index].nl;
-                
-                if(ans === correct.toLowerCase()) { state.score++; }
-                state.index++;
-                e.target.value = "";
-                
-                if(state.index < words.length) render(); else showResults();
-            }
-        });
-
-        function showResults() {
-            showScreen('results-screen');
-            const duration = Math.round((Date.now() - state.startTime) / 1000);
-            document.getElementById('res-score').innerText = `${Math.round((state.score/words.length)*100)}%`;
-            document.getElementById('res-time').innerText = `${duration}s`;
-            document.getElementById('res-count').innerText = `${state.score}/${words.length}`;
-        }
-
-        function showScreen(id) {
-            ['setup-screen', 'session-screen', 'results-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        lucide.createIcons();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
