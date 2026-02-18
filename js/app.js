@@ -2,20 +2,14 @@ let settings = { mode: 'oefenen', direction: 'nl_jp', selectedCats: [] };
 let session = { queue: [], index: 0, correct: 0, mistakes: [] };
 
 window.onload = () => {
-    lucide.createIcons();
-    renderCategories();
-
-let settings = { mode: 'oefenen', direction: 'nl_jp', selectedCats: [] };
-let session = { queue: [], index: 0, correct: 0, mistakes: [] };
-
-window.onload = () => {
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     renderCategories();
 };
 
 function renderCategories() {
     const cats = [...new Set(allWords.map(w => w.cat))];
     const grid = document.getElementById('category-grid');
+    if (!grid) return;
     grid.innerHTML = '';
     cats.forEach(cat => {
         const btn = document.createElement('button');
@@ -23,9 +17,11 @@ function renderCategories() {
         btn.innerText = cat;
         btn.onclick = () => {
             btn.classList.toggle('active');
-            settings.selectedCats.includes(cat) ? 
-                settings.selectedCats = settings.selectedCats.filter(c => c !== cat) : 
+            if (settings.selectedCats.includes(cat)) {
+                settings.selectedCats = settings.selectedCats.filter(c => c !== cat);
+            } else {
                 settings.selectedCats.push(cat);
+            }
         };
         grid.appendChild(btn);
     });
@@ -40,36 +36,41 @@ function selectOption(key, value, btn) {
 function startSession() {
     let list = allWords.filter(w => settings.selectedCats.length === 0 || settings.selectedCats.includes(w.cat));
     list.sort(() => Math.random() - 0.5);
-    const count = parseInt(document.getElementById('word-count').value) || 10;
+    const countInput = document.getElementById('word-count');
+    const count = countInput ? parseInt(countInput.value) : 10;
     
     session = { queue: list.slice(0, count), index: 0, correct: 0, mistakes: [] };
     
-    if(session.queue.length === 0) return alert("Kies eerst een categorie!");
+    if (session.queue.length === 0) return alert("Kies eerst een categorie!");
 
     document.getElementById('screen-setup').classList.add('hidden');
     document.getElementById('screen-quiz').classList.remove('hidden');
-    document.getElementById('btn-hint').style.visibility = settings.mode === 'toets' ? 'hidden' : 'visible';
+    
+    const hintBtn = document.getElementById('btn-hint');
+    if (hintBtn) hintBtn.style.visibility = settings.mode === 'toets' ? 'hidden' : 'visible';
     
     renderWord();
 }
 
 function renderWord() {
     const w = session.queue[session.index];
-    document.getElementById('display-word').innerText = settings.direction === 'nl_jp' ? w.nl : w.jp;
+    const display = document.getElementById('display-word');
+    const badge = document.getElementById('category-badge');
+    
+    display.innerText = settings.direction === 'nl_jp' ? w.nl : w.jp;
     document.getElementById('quiz-counter').innerText = `WOORD ${session.index + 1} / ${session.queue.length}`;
     
-    // Hier voegen we het type (Hiragana/Katakana) toe aan de badge
-    document.getElementById('category-badge').innerText = `${w.cat} (${w.type})`;
-    
+    // Toont: Categorie | Taal (Hoofdklank)
+    let extraInfo = `${w.cat} | ${w.taal}`;
+    if (w.hoofdklank) extraInfo += ` (${w.hoofdklank})`;
+    badge.innerText = extraInfo;
+
     document.getElementById('progress-bar').style.width = `${(session.index / session.queue.length) * 100}%`;
-    document.getElementById('user-input').value = '';
-    document.getElementById('user-input').focus();
+    const input = document.getElementById('user-input');
+    input.value = '';
+    input.focus();
     document.getElementById('feedback-msg').innerText = '';
 }
-
-document.getElementById('user-input').addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') checkAnswer();
-});
 
 function checkAnswer() {
     const input = document.getElementById('user-input');
@@ -77,26 +78,30 @@ function checkAnswer() {
     const w = session.queue[session.index];
     const correct = (settings.direction === 'nl_jp' ? w.jp : w.nl).toLowerCase();
 
-    if(val === correct) {
+    if (val === correct) {
         session.correct++;
         showFeedback("Correct!", "text-green-500");
         setTimeout(nextWord, 600);
     } else {
-        if(settings.mode === 'toets') {
+        if (settings.mode === 'toets') {
             session.mistakes.push({...w, userAnswer: val});
             showFeedback("Fout", "text-red-500");
             setTimeout(nextWord, 600);
         } else {
             input.classList.add('shake');
             setTimeout(() => input.classList.remove('shake'), 400);
-            showFeedback("Probeer het nog eens...", "text-red-400");
+            showFeedback(`Niet goed. Hint: ${w.romaji}`, "text-red-400");
         }
     }
 }
 
+document.getElementById('user-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+});
+
 function nextWord() {
     session.index++;
-    if(session.index < session.queue.length) renderWord();
+    if (session.index < session.queue.length) renderWord();
     else finishSession();
 }
 
@@ -106,12 +111,15 @@ function finishSession() {
     document.getElementById('final-score').innerText = Math.round((session.correct / session.queue.length) * 100) + '%';
     document.getElementById('stat-correct').innerText = session.correct;
 
-    if(session.mistakes.length > 0) {
+    if (session.mistakes.length > 0) {
         document.getElementById('mistakes-container').classList.remove('hidden');
         const list = document.getElementById('mistakes-list');
         list.innerHTML = session.mistakes.map(m => 
             `<div class="p-4 bg-zinc-50 rounded-2xl border border-zinc-100 flex justify-between items-center">
-                <span class="font-bold">${m.jp}</span>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg">${m.jp}</span>
+                    <span class="text-xs text-zinc-400">${m.romaji}</span>
+                </div>
                 <span class="text-red-500 font-bold">${m.nl}</span>
             </div>`
         ).join('');
@@ -120,8 +128,7 @@ function finishSession() {
 
 function getHint() {
     const w = session.queue[session.index];
-    const hint = settings.direction === 'nl_jp' ? w.jp[0] : w.nl[0];
-    showFeedback(`Begint met: ${hint}`, "text-zinc-400");
+    showFeedback(`Romaji: ${w.romaji}`, "text-zinc-400");
 }
 
 function showFeedback(msg, color) {
